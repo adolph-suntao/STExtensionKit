@@ -101,7 +101,7 @@ extension ST where Base == String {
             let dict = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
             return dict as? [String: Any]
 
-        } catch let error {
+        }catch let _ {
 //            dPrint(content: error)
             return nil
         }
