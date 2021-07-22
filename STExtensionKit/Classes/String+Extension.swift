@@ -8,14 +8,14 @@
 
 import Foundation
 
-public protocol StringType {
+protocol StringType {
     var getStr:String { get }
 }
 
 /// 可选字符串空判断
 extension Optional where Wrapped: StringType {
     /// true 空
-    public var strIsEmpty: Bool {
+    var strIsEmpty: Bool {
         if let str = self?.getStr {
             return str.isEmpty
         }
@@ -24,7 +24,7 @@ extension Optional where Wrapped: StringType {
 }
 
 extension String: StringType {
-    public var getStr: String {
+    var getStr: String {
         return self
     }
 }
@@ -32,11 +32,11 @@ extension String: STCompatible {}
 extension ST where Base == String {
 
     /// 转换为二进制数组
-    public func toData() -> Data {
+    func toData() -> Data {
         return base.decomposedStringWithCompatibilityMapping.data(using: .utf8)!
     }
     
-    public static func getHexStrWithUInt8(arr: [UInt8]) -> String {
+    static func getHexStrWithUInt8(arr: [UInt8]) -> String {
         var result = ""
         for value in arr {
             let str = toHex(Int(value))
@@ -46,7 +46,7 @@ extension ST where Base == String {
     }
 
     // 十进制转换成十六进制
-    public static func toHex(_ num: Int) -> String? {
+    static func toHex(_ num: Int) -> String? {
         let result = String(format: "%llx", num)
         if num == 0 {
             return "00"
@@ -63,7 +63,7 @@ extension ST where Base == String {
     }
 
     // MARK: 随机字符串
-    public static func getRandomStr(len : Int, random_str_characters: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") -> String{
+    static func getRandomStr(len : Int, random_str_characters: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") -> String{
         var ranStr = ""
         for _ in 0..<len {
             let index = Int(arc4random_uniform(UInt32(random_str_characters.count)))
@@ -73,7 +73,7 @@ extension ST where Base == String {
     }
     
     /// 生成随机密码
-    public static func getPwdRandomStr(minLen: Int, maxLen: Int) -> String {
+    static func getPwdRandomStr(minLen: Int, maxLen: Int) -> String {
         var len = Int(arc4random_uniform(UInt32(maxLen-minLen))) + minLen
         if len < 6 { len = 6 }
         let first = getRandomStr(len: 1, random_str_characters: "0123456789")
@@ -85,9 +85,8 @@ extension ST where Base == String {
         return text
     }
     
-    
     /// URL 编码
-    public func URLEncode() -> String? {
+    func URLEncode() -> String? {
         let allowedCharacters = base.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ":&=\"#%/<>?@\\^`{|}").inverted) ?? ""
         return allowedCharacters
     }
@@ -95,20 +94,20 @@ extension ST where Base == String {
     /// JSONString转换为字典
     /// - Parameter jsonString: json
     /// - Returns: dic
-    public func getDictionaryAboutJSONString() -> [String: Any]? {
+    func getDictionaryAboutJSONString() -> [String: Any]? {
         let jsonData:Data = base.data(using: .utf8)!
         do {
             let dict = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)
             return dict as? [String: Any]
 
-        }catch let _ {
-//            dPrint(content: error)
+        } catch let error {
+            print(error)
             return nil
         }
     }
     
     /// 获取用于Label显示的富文本字符串
-    public func getHtmlAttributedText(font: UIFont = UIFont.systemFont(ofSize: 13), textColor: UIColor?, lineSpacing: CGFloat = 4) -> NSAttributedString? {
+    func getHtmlAttributedText(font: UIFont = UIFont.systemFont(ofSize: 13), textColor: UIColor?, lineSpacing: CGFloat = 4) -> NSAttributedString? {
         do {
             let attrText = try NSMutableAttributedString(data: base.data(using: .unicode) ?? Data(), options: [NSAttributedString.DocumentReadingOptionKey.documentType : NSAttributedString.DocumentType.html], documentAttributes: nil)
             
@@ -133,7 +132,7 @@ extension ST where Base == String {
 
     /// 从某个位置开始截取：
     /// - Parameter index: 起始位置
-    public func substring(from index: Int) -> String {
+    func substring(from index: Int) -> String {
         if(base.count > index){
             let startIndex = base.index(base.startIndex,offsetBy: index)
             let subString = base[startIndex..<base.endIndex];
@@ -145,7 +144,7 @@ extension ST where Base == String {
     
     /// 从零开始截取到某个位置：
     /// - Parameter index: 达到某个位置
-    public func substring(to index: Int) -> String {
+    func substring(to index: Int) -> String {
         if(base.count > index){
             let endindex = base.index(base.startIndex, offsetBy: index)
             let subString = base[base.startIndex..<endindex]
@@ -157,7 +156,7 @@ extension ST where Base == String {
     
     /// 某个范围内截取
     /// - Parameter rangs: 范围
-    public func subString(rang rangs: NSRange) -> String{
+    func subString(rang rangs: NSRange) -> String{
         var string = String()
         if(rangs.location >= 0) && (base.count > (rangs.location + rangs.length)){
             let startIndex = base.index(base.startIndex,offsetBy: rangs.location)
@@ -170,7 +169,7 @@ extension ST where Base == String {
         
     /// 获取小数点后两位。没有的自动拼接
     /// - Returns: 返回结果
-    public func geTwoDecimalString() -> String {
+    func geTwoDecimalString() -> String {
         guard !base.isEmpty else { return "" }
         
         let arr = base.components(separatedBy: ".")
@@ -197,19 +196,19 @@ extension ST where Base == String {
     }
     
     // MARK: - 字符串高度计算 计算文字高度或者宽度与weight参数无关
-    public func widthForComment(fontSize: CGFloat, height: CGFloat = 15) -> CGFloat {
+    func widthForComment(fontSize: CGFloat, height: CGFloat = 15) -> CGFloat {
         let font = UIFont.systemFont(ofSize: fontSize)
         let rect = NSString(string: base).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: height), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
         return ceil(rect.width)
     }
     
-    public func heightForComment(fontSize: CGFloat, width: CGFloat) -> CGFloat {
+    func heightForComment(fontSize: CGFloat, width: CGFloat) -> CGFloat {
         let font = UIFont.systemFont(ofSize: fontSize)
         let rect = NSString(string: base).boundingRect(with: CGSize(width: width, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
         return ceil(rect.height)
     }
     
-    public func heightForComment(fontSize: CGFloat, width: CGFloat, maxHeight: CGFloat) -> CGFloat {
+    func heightForComment(fontSize: CGFloat, width: CGFloat, maxHeight: CGFloat) -> CGFloat {
         let font = UIFont.systemFont(ofSize: fontSize)
         let rect = NSString(string: base).boundingRect(with: CGSize(width: width, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
         return ceil(rect.height)>maxHeight ? maxHeight : ceil(rect.height)
@@ -225,9 +224,10 @@ extension ST where Base == String {
     ///   - title: 标题
     ///   - content: 内容
     ///   - isnotice: 是否关注
-    ///   - isCompany: 是否是企业账号
+    ///   - isPerson: 是否是个人认证
+    ///   - isCompany: 是否是企业认证
     /// - Returns: 展示的Html
-    public static func getArticalDetailHtml(htmlUrl: URL, logoUrl: String?, time: String?, nick_name: String?, title: String?, content: String?, isShowNotice: Bool, isnotice: Bool, isCompany: Bool) -> String? {
+    static func getArticalDetailHtml(htmlUrl: URL, logoUrl: String?, time: String?, nick_name: String?, title: String?, content: String?, isShowNotice: Bool, isnotice: Bool, isPerson: Bool, isCompany: Bool) -> String? {
         do {
             let urlString = try String(contentsOf: htmlUrl, encoding: String.Encoding.utf8)
             /// logo 路径
@@ -264,9 +264,12 @@ extension ST where Base == String {
             html = html.replacingOccurrences(of: "%17$s", with: isnoticeStr)
             
             /// 是否企业账号
-            var isCompanyStr = "false"
+            var isCompanyStr = "0"
+            if isPerson {
+                isCompanyStr = "1"
+            }
             if isCompany {
-                isCompanyStr = "true"
+                isCompanyStr = "2"
             }
             html = html.replacingOccurrences(of: "%18$s", with: isCompanyStr)
             
@@ -288,7 +291,7 @@ extension ST where Base == String {
     }
     
     /// 阅读页H5头
-    public static func getReadDetailHtml(html: String) -> String {
+    static func getReadDetailHtml(html: String) -> String {
        let str = """
                 <!DOCTYPE html>
                 <html>
@@ -324,7 +327,7 @@ extension ST where Base == String {
     }
     
     /// 消息页面
-    public static func getCustomelHtml(html: String, font: Int = 14) -> String {
+    static func getCustomelHtml(html: String, font: Int = 14) -> String {
        let str = """
                 <!DOCTYPE html>
                 <html>
@@ -373,4 +376,5 @@ extension ST where Base == String {
         return str
     }
 }
+
 
