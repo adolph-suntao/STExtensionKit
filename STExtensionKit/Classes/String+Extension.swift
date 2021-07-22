@@ -8,12 +8,12 @@
 
 import Foundation
 
-protocol StringType {
+public protocol StringType {
     var getStr:String { get }
 }
 
 /// 可选字符串空判断
-extension Optional where Wrapped: StringType {
+public extension Optional where Wrapped: StringType {
     /// true 空
     var strIsEmpty: Bool {
         if let str = self?.getStr {
@@ -22,14 +22,13 @@ extension Optional where Wrapped: StringType {
         return true
     }
 }
-
-extension String: StringType {
-    var getStr: String {
+ extension String: StringType {
+    public var getStr: String {
         return self
     }
 }
 extension String: STCompatible {}
-extension ST where Base == String {
+public extension ST where Base == String {
 
     /// 转换为二进制数组
     func toData() -> Data {
@@ -376,5 +375,6 @@ extension ST where Base == String {
         return str
     }
 }
+
 
 

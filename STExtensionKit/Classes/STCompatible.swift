@@ -10,7 +10,7 @@ import Foundation
 
 /// 面向协议编程，增加前缀  https://juejin.cn/post/6959726335207931918
 public struct ST<Base> {
-    var base: Base
+    public var base: Base
     init(_ base: Base) {
         self.base = base
     }
