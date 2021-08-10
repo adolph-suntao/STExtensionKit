@@ -194,6 +194,49 @@ public extension ST where Base == String {
         return "\(resultDN)".st.geTwoDecimalString()
     }
     
+    /// URL 字符串拼接参数。如果原参数中已经有值，则直接替换，没有重新添加
+    /// - Parameters:
+    ///   - param: 拼接的参数
+    ///   - fragment: 信息片段，拼接在url最后面
+    /// - Returns: 返回结果
+    func urlAddFragment(param: [String: Any], fragment: String?) -> String? {
+        guard let url = URL(string: base) else {
+            return nil
+        }
+        
+        guard let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+        
+        if urlComponents.queryItems == nil {
+            urlComponents.queryItems = [URLQueryItem]()
+        }
+        /// 添加参数
+        for (key, value) in param {
+            let item = URLQueryItem(name: key, value: "\(value)")
+            if let items = urlComponents.queryItems, items.count > 0 {
+                var hasRepeaItem = false
+                for index in 0 ..< items.count {
+                    if urlComponents.queryItems?[index].name == key {
+                        hasRepeaItem = true
+                        urlComponents.queryItems?[index].value = "\(value)"
+                    }
+                }
+                if !hasRepeaItem {
+                    urlComponents.queryItems?.append(item)
+                }
+                
+            } else {
+                urlComponents.queryItems?.append(item)
+            }
+        }
+        /// 拼接信息片段
+        if let frag = fragment {
+            urlComponents.fragment = frag
+        }
+        return urlComponents.url?.absoluteString
+    }
+    
     // MARK: - 字符串高度计算 计算文字高度或者宽度与weight参数无关
     func widthForComment(fontSize: CGFloat, height: CGFloat = 15) -> CGFloat {
         let font = UIFont.systemFont(ofSize: fontSize)
