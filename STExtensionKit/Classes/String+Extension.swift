@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Base58
 
 public protocol StringType {
     var getStr:String { get }
@@ -30,10 +31,43 @@ public extension Optional where Wrapped: StringType {
 extension String: STCompatible {}
 public extension ST where Base == String {
 
+    /// base58HmacSHA256
+    /// - Parameter key:
+    /// - Returns:
+    func base58HmacSHA256StringWithKey(key: String) -> String {
+        let str = NSString(string: base)
+        let data = str.dataWithHmacSHA256String(withKey: key)
+        return Base58.encodeDataToString(data)
+    }
+    
     /// 转换为二进制数组
     func toData() -> Data {
         return base.decomposedStringWithCompatibilityMapping.data(using: .utf8)!
     }
+    
+    /// 十六进制字符串转换为二进制数组
+    func getTenStrWithHex() -> [UInt8]? {
+        guard var bytes = NSString(string: base).convertHexStrToData() else { return nil }
+        var zerosCount = 0
+        
+        for b in bytes {
+            if b != 0 { break }
+            zerosCount += 1
+        }
+        bytes.removeFirst(zerosCount)
+        return Data.st.convertBytesToBase(bytes)
+    }
+    
+    /// MD5
+    var md5Str: String {
+        let str = NSString(string: base)
+        return str.md5()
+    }
+    
+    /// 转换为二进制数组
+//    func toData() -> Data {
+//        return base.decomposedStringWithCompatibilityMapping.data(using: .utf8)!
+//    }
     
     static func getHexStrWithUInt8(arr: [UInt8]) -> String {
         var result = ""
@@ -90,6 +124,13 @@ public extension ST where Base == String {
         return allowedCharacters
     }
     
+    /// URL 编码
+    func URLEncodeWithSpecailCharacter() -> String? {
+        let allowedCharacters = base.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "{}").inverted) ?? ""
+        return allowedCharacters
+    }
+
+    
     /// JSONString转换为字典
     /// - Parameter jsonString: json
     /// - Returns: dic
@@ -117,7 +158,6 @@ public extension ST where Base == String {
     
             let range = NSRange(location: 0, length: attrText.string.count)
             attrText.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: range)
-//            attrText.addAttribute(NSAttributedString.Key.font, value: font, range: range)
             
             if let color = textColor {
                 attrText.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
@@ -188,7 +228,13 @@ public extension ST where Base == String {
             return base
         }
         
-        let roundingBehavior = NSDecimalNumberHandler(roundingMode: .plain, scale: 2, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: false)
+        /// 超过位数直接舍掉 .down
+        let roundingBehavior = NSDecimalNumberHandler(roundingMode: .down,
+                                                      scale: 2,
+                                                      raiseOnExactness: false,
+                                                      raiseOnOverflow: false,
+                                                      raiseOnUnderflow: false,
+                                                      raiseOnDivideByZero: false)
         let aDN = NSDecimalNumber(string: base)
         let resultDN = aDN.rounding(accordingToBehavior: roundingBehavior)
         return "\(resultDN)".st.geTwoDecimalString()

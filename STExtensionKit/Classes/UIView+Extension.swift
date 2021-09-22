@@ -11,7 +11,7 @@ import Foundation
 extension UIView {
     
     /// 部分圆角 注意⚠️ xib需要在 layoutSubviews 中设置
-    ///
+    ///  tableveiw 不能使用缓存行高，使用了之后会出现不显示控件的问题
     /// - Parameters:
     ///   - corners: 需要实现为圆角的角，可传入多个
     ///   - radii: 圆角半径

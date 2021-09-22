@@ -30,8 +30,8 @@
 /* Begin PBXFileReference section */
 		1E8D8CF85D260D5DA0CF7161 /* Pods-STExtensionKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-STExtensionKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-STExtensionKit_Example/Pods-STExtensionKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		2F58926EB63FD80C818865AF /* Pods-STExtensionKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-STExtensionKit_Tests.release.xcconfig"; path = "Target Support Files/Pods-STExtensionKit_Tests/Pods-STExtensionKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		33FDA50AD664A1A745E5CA1E /* STExtensionKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = STExtensionKit.podspec; path = ../STExtensionKit.podspec; sourceTree = "<group>"; };
-		3A304C29B28D716D4AE7BB65 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		33FDA50AD664A1A745E5CA1E /* STExtensionKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = STExtensionKit.podspec; path = ../STExtensionKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		3A304C29B28D716D4AE7BB65 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* STExtensionKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = STExtensionKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -43,7 +43,7 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		6FE2AF80120932E5255DBC40 /* Pods-STExtensionKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-STExtensionKit_Example.release.xcconfig"; path = "Target Support Files/Pods-STExtensionKit_Example/Pods-STExtensionKit_Example.release.xcconfig"; sourceTree = "<group>"; };
-		7A103BB0C95B209EEC5CCE74 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		7A103BB0C95B209EEC5CCE74 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		87F88058232D86F09D07FC2E /* Pods_STExtensionKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_STExtensionKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C805644162070CF049C4FC1F /* Pods_STExtensionKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_STExtensionKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8DBDD9520526CE582F82816 /* Pods-STExtensionKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-STExtensionKit_Tests.debug.xcconfig"; path = "Target Support Files/Pods-STExtensionKit_Tests/Pods-STExtensionKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -156,7 +156,6 @@
 				C8DBDD9520526CE582F82816 /* Pods-STExtensionKit_Tests.debug.xcconfig */,
 				2F58926EB63FD80C818865AF /* Pods-STExtensionKit_Tests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -227,6 +226,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -291,10 +291,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-STExtensionKit_Example/Pods-STExtensionKit_Example-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Base58/Base58.framework",
 				"${BUILT_PRODUCTS_DIR}/STExtensionKit/STExtensionKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base58.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/STExtensionKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

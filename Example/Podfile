@@ -2,8 +2,13 @@ use_frameworks!
 
 platform :ios, '9.0'
 
+source 'https://github.com/CocoaPods/Specs.git'  # 官方库
+source 'https://github.com/adolph-suntao/PrivateSpec.git' # 私有库Repo地址
+
 target 'STExtensionKit_Example' do
+  
   pod 'STExtensionKit', :path => '../'
+  pod 'Base58', '0.1.0'
 
   target 'STExtensionKit_Tests' do
     inherit! :search_paths
