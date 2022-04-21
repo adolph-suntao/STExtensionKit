@@ -19,6 +19,8 @@ extension UIColor {
     /// 背景颜色 tableview
     public static let contentGrayColor = UIColor(hexRGB: 0xF9F9F9)
     public static let contentGrayF5 = UIColor(hexRGB: 0xF5F5F5)
+    public static let contentGrayEC = UIColor(hexRGB: 0xECECEC)
+
     /// 主题黑色
     public static let themeTitleColor = UIColor(hexRGB: 0x151518)
     

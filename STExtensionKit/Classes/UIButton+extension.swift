@@ -22,7 +22,8 @@ extension ST where Base == UIButton {
     ///   - type: 图片位置
     ///   - space: 图片和文字的间距
     public func setLayoutType(type: ButtonLayout, space: CGFloat = 0.0){
-        let text_W = ST.textWidth(text: self.base.titleLabel?.text, font: (self.base.titleLabel?.font)!, height: self.base.bounds.height)
+        var text_W = ST.textWidth(text: self.base.titleLabel?.text, font: (self.base.titleLabel?.font)!, height: self.base.bounds.height)
+        text_W = text_W > base.width ? base.width - 10 : text_W
         let text_H = ST.textHeight(text: self.base.titleLabel?.text, font: (self.base.titleLabel?.font)!, width: self.base.bounds.width)
         let img_w = self.base.imageView?.image?.size.width ?? 0.0
         let img_H = self.base.imageView?.image?.size.height ?? 0.0

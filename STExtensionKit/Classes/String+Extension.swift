@@ -63,12 +63,7 @@ public extension ST where Base == String {
         let str = NSString(string: base)
         return str.md5()
     }
-    
-    /// 转换为二进制数组
-//    func toData() -> Data {
-//        return base.decomposedStringWithCompatibilityMapping.data(using: .utf8)!
-//    }
-    
+        
     static func getHexStrWithUInt8(arr: [UInt8]) -> String {
         var result = ""
         for value in arr {
@@ -78,7 +73,7 @@ public extension ST where Base == String {
         return result
     }
 
-    // 十进制转换成十六进制
+    /// 十进制转换成十六进制
     static func toHex(_ num: Int) -> String? {
         let result = String(format: "%llx", num)
         if num == 0 {
@@ -118,19 +113,28 @@ public extension ST where Base == String {
         return text
     }
     
-    /// URL 编码
+    /// URL 编码 不适用于编码单个编码，如果为了获取url的参数，则使用此方法
     func URLEncode() -> String? {
-        let allowedCharacters = base.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ":&=\"#%/<>?@\\^`{|}").inverted) ?? ""
+        
+        let content = base.removingPercentEncoding
+        /// 处理fragment问题
+        let count = content?.components(separatedBy: "#").count ?? 0
+        var charactersIn = "%<>[]\\^`{|}"
+        if count > 2 {
+            charactersIn += "#"
+        }
+        
+        let allowedCharacters = content?.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: charactersIn).inverted)
         return allowedCharacters
     }
     
-    /// URL 编码
-    func URLEncodeWithSpecailCharacter() -> String? {
-        let allowedCharacters = base.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "{}").inverted) ?? ""
+    /// URL编码，如果url需要作为请求参数，则使用此方法。
+    func URLEncodeAll() -> String? {
+        let content = base.removingPercentEncoding
+        let allowedCharacters = content?.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ":&=\"#%/<>?@\\^`{|}").inverted)
         return allowedCharacters
     }
 
-    
     /// JSONString转换为字典
     /// - Parameter jsonString: json
     /// - Returns: dic
@@ -148,25 +152,28 @@ public extension ST where Base == String {
     
     /// 获取用于Label显示的富文本字符串
     func getHtmlAttributedText(font: UIFont = UIFont.systemFont(ofSize: 13), textColor: UIColor?, lineSpacing: CGFloat = 4) -> NSAttributedString? {
-        do {
-            let attrText = try NSMutableAttributedString(data: base.data(using: .unicode) ?? Data(), options: [NSAttributedString.DocumentReadingOptionKey.documentType : NSAttributedString.DocumentType.html], documentAttributes: nil)
-            
-            /// 行间距
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineSpacing = lineSpacing
-            paragraphStyle.lineBreakMode = .byTruncatingTail
-    
-            let range = NSRange(location: 0, length: attrText.string.count)
-            attrText.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: range)
-            
-            if let color = textColor {
-                attrText.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
-            }
-            
-            return attrText
-        } catch  {
+        guard let data = base.data(using: .unicode) else {
             return nil
         }
+        
+        let options: [NSAttributedString.DocumentReadingOptionKey : Any] = [.documentType: NSMutableAttributedString.DocumentType.html,
+                                                                            .characterEncoding: String.Encoding.utf8.rawValue]
+        
+        let attrText = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil)
+        
+        /// 行间距
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = lineSpacing
+        paragraphStyle.lineBreakMode = .byTruncatingTail
+        
+        let range = NSRange(location: 0, length: attrText?.string.count ?? 0)
+        attrText?.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: range)
+        
+        if let color = textColor {
+            attrText?.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
+        }
+        
+        return attrText
     }
 
     /// 从某个位置开始截取：
@@ -238,6 +245,44 @@ public extension ST where Base == String {
         let aDN = NSDecimalNumber(string: base)
         let resultDN = aDN.rounding(accordingToBehavior: roundingBehavior)
         return "\(resultDN)".st.geTwoDecimalString()
+    }
+    
+    /// 亮媒价格规则， 如果有小数点，则显示小数点，最大支持2位。没有则不显示
+    /// - Returns: 返回结果
+    func getPriceDecimalString() -> String {
+        guard !base.isEmpty else { return "" }
+        
+        let arr = base.components(separatedBy: ".")
+        if arr.count <= 1 {
+            return base
+        }
+        if arr.count > 2 {
+            /// 价格不合法
+            return ""
+        }
+
+        let firstStr = arr.first ?? ""
+        let lastStr = arr.last ?? ""
+       
+        if lastStr.count <= 2 {
+            if lastStr == "0" || lastStr == "00" {
+                return firstStr
+            } else {
+                return base
+            }
+            
+        } else {
+            /// 超过位数直接舍掉 .down
+            let roundingBehavior = NSDecimalNumberHandler(roundingMode: .down,
+                                                          scale: 2,
+                                                          raiseOnExactness: false,
+                                                          raiseOnOverflow: false,
+                                                          raiseOnUnderflow: false,
+                                                          raiseOnDivideByZero: false)
+            let aDN = NSDecimalNumber(string: base)
+            let resultDN = aDN.rounding(accordingToBehavior: roundingBehavior)
+            return "\(resultDN)".st.geTwoDecimalString()
+        }
     }
     
     /// URL 字符串拼接参数。如果原参数中已经有值，则直接替换，没有重新添加

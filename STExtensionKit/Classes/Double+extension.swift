@@ -14,6 +14,9 @@ extension ST where Base == Double {
     /// - Parameter places: 保留的位数
     /// - Returns: 返回结果
     public func roundTo(places: Int) -> Double {
+        guard !base.isNaN else {
+            return 0.0
+        }
         let divisor = pow(10.0, Double(places))
         return (base * divisor).rounded() / divisor
     }
@@ -22,6 +25,9 @@ extension ST where Base == Double {
     /// - Parameter places: 保留的位数
     /// - Returns: 返回结果
     public func truncate(places: Int) -> Double {
+        guard !base.isNaN else {
+            return 0.0
+        }
         let divisor = pow(10.0, Double(places))
         return Double(Int(base * divisor)) / divisor
     }

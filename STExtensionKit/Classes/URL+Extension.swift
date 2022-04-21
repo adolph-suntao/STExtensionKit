@@ -19,18 +19,19 @@ extension ST where Base == URL {
         }
     }
     
+    /// 修改url中的参数
     public func changeUrlParameter(newData: [String: Any]) -> URL? {
         var components = URLComponents(url: base, resolvingAgainstBaseURL: true)
         if var queryItems = components?.queryItems {
             for i in 0 ..< queryItems.count {
                 for (key, value) in newData {
                     if queryItems[i].name == key {
-                        queryItems[i].value = (value as? String)
+                        queryItems[i].value = "\(value)"
                     }
                 }
             }
             components?.queryItems = queryItems
         }
-        return components?.url
+        return components?.url?.absoluteURL
     }
 }
