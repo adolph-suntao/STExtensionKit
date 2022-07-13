@@ -11,6 +11,33 @@ import UIKit
 extension UIImage: STCompatible {}
 
 public extension ST where Base == UIImage {
+
+    
+    /// 向Image添加圆角
+    /// - Parameters:
+    ///   - corners: 圆角位置
+    ///   - radius: 半径
+    ///   - sizetoFit: Image 的 Size
+    /// - Returns: 添加圆角之后的结果
+    func drawRectWithRoundedCorner(corners: UIRectCorner, radius: CGFloat, sizetoFit: CGSize) -> UIImage? {
+        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: sizetoFit)
+        
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return base
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
+        context.addPath(UIBezierPath(roundedRect: rect, byRoundingCorners: corners,
+                                     cornerRadii: CGSize(width: radius, height: radius)).cgPath)
+        UIGraphicsGetCurrentContext()?.clip()
+        
+        base.draw(in: rect)
+        context.drawPath(using: .fillStroke)
+        let output = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        return output
+    }
     
     // MARK: - 颜色转图片
     public static func imageWithColor(color: UIColor = .white) -> UIImage? {
