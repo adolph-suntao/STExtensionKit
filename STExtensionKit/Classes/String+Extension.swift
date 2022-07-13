@@ -63,7 +63,26 @@ public extension ST where Base == String {
         let str = NSString(string: base)
         return str.md5()
     }
+      
+    /// 去掉html的标签
+    var filterHtmlString: String {
+        let scanner = Scanner(string: base)
+        var text:NSString?
+        var result:String = base
         
+        while scanner.isAtEnd == false {
+            scanner.scanUpTo("<", into: nil)
+            scanner.scanUpTo(">", into: &text)
+            result = result.replacingOccurrences(of: "\(text ?? "")>", with: "")
+        }
+
+        if result.contains("&nbsp;") {
+            result = result.replacingOccurrences(of: "&nbsp;", with: "")
+        }
+        
+        return result
+    }
+    
     static func getHexStrWithUInt8(arr: [UInt8]) -> String {
         var result = ""
         for value in arr {
