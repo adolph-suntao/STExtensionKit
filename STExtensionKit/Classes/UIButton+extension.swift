@@ -75,7 +75,7 @@ extension ST where Base == UIButton {
     /// - Returns: UIBarButtonItem
     public static func getCustomBtnItem(title: String,
                                  TitleColor: UIColor = UIColor.themeBlueColor,
-                                 font: UIFont = UIFont.systemFont(ofSize: 15)) -> UIButton {
+                                 font: UIFont = UIFont.systemFont(ofSize: 16)) -> UIButton {
         
         let btn = UIButton(type: .custom)
         btn.setTitle(title, for: .normal)

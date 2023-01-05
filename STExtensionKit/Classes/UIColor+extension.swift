@@ -15,9 +15,12 @@ extension UIColor {
     /// 边框颜色
     public static let themeBorderColor = UIColor(RGB: 236)
     /// 横线颜色
-    public static let lineColor = UIColor(hexRGB: 0xECECEC)
+    public static let lineColor = UIColor(hexRGB: 0xF5F5F5)
+    public static let lineAdv = UIColor(hexRGB: 0xF5F5F5)
+    public static let lineCard = UIColor(hexRGB: 0xF5F5F5)
+
     /// 背景颜色 tableview
-    public static let contentGrayColor = UIColor(hexRGB: 0xF9F9F9)
+    public static let contentGrayColor = UIColor(hexRGB: 0xF5F5F5)
     public static let contentGrayF5 = UIColor(hexRGB: 0xF5F5F5)
     public static let contentGrayEC = UIColor(hexRGB: 0xECECEC)
 

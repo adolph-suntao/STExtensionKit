@@ -9,6 +9,57 @@
 import Foundation
 import Base58
 
+extension NSMutableAttributedString {
+
+    /// 去掉首尾空格
+    func trimmedAttributedString(set: CharacterSet) -> NSMutableAttributedString {
+
+        /// 相反的字符集。例如CharacterSet.whitespaces.inverted 就是没有空格
+        let invertedSet = set.inverted
+
+        var range = (string as NSString).rangeOfCharacter(from: invertedSet)
+        let loc = range.length > 0 ? range.location : 0
+
+        range = (string as NSString).rangeOfCharacter(
+                            from: invertedSet, options: .backwards)
+        let len = (range.length > 0 ? NSMaxRange(range) : string.count) - loc
+
+        let r = self.attributedSubstring(from: NSMakeRange(loc, len))
+        return NSMutableAttributedString(attributedString: r)
+    }
+    
+    /// 过滤全部空格
+    func trimmedWiteSpace(set: CharacterSet) -> NSMutableAttributedString {
+        var result = string as NSString
+        var range = result.rangeOfCharacter(from: set)
+        while range.length != 0 {
+            result = result.replacingCharacters(in: range, with: "") as NSString
+            range = result.rangeOfCharacter(from: set)
+        }
+        return NSMutableAttributedString(attributedString: NSAttributedString(string: result as String))
+    }
+}
+
+extension Data {
+    var html2AttributedString: NSAttributedString? {
+        do {
+            let attrStr = try NSMutableAttributedString(data: self,
+                                                        options: [.documentType: NSAttributedString.DocumentType.html,
+                                                                .characterEncoding: String.Encoding.utf8.rawValue],
+                                                        documentAttributes: nil)
+            return attrStr
+            
+        } catch {
+            print("error:", error)
+            return nil
+        }
+    }
+    
+    var html2String: String {
+        html2AttributedString?.string ?? ""
+    }
+}
+
 public protocol StringType {
     var getStr:String { get }
 }
@@ -66,23 +117,25 @@ public extension ST where Base == String {
       
     /// 去掉html的标签
     var filterHtmlString: String {
-        let scanner = Scanner(string: base)
-        var text:NSString?
-        var result:String = base
+        var result = Data(base.utf8).html2AttributedString?.string ?? ""
         
-        while scanner.isAtEnd == false {
-            scanner.scanUpTo("<", into: nil)
-            scanner.scanUpTo(">", into: &text)
-            result = result.replacingOccurrences(of: "\(text ?? "")>", with: "")
+        guard let regex = try? NSRegularExpression(pattern: "\\t[0-9]+.\\t|\\t•\\t", options: []) else {
+            return result
         }
-
-        if result.contains("&nbsp;") {
-            result = result.replacingOccurrences(of: "&nbsp;", with: "")
-        }
+        let range = NSRange(location: 0, length: result.count)
+        let regexResult = regex.numberOfMatches(in: result, options: [], range: range)
         
-        return result
+        let mustr = NSMutableString(string: result)
+        let aa = regex.replaceMatches(in: mustr, range: range, withTemplate: "")
+        
+        if aa > 0 {
+            return NSMutableAttributedString(string: mustr as String).trimmedWiteSpace(set: .whitespacesAndNewlines).string
+            
+        } else {
+            return NSMutableAttributedString(string: result).trimmedWiteSpace(set: .whitespacesAndNewlines).string
+        }
     }
-    
+
     static func getHexStrWithUInt8(arr: [UInt8]) -> String {
         var result = ""
         for value in arr {
@@ -529,5 +582,126 @@ public extension ST where Base == String {
     }
 }
 
+public extension String {
+    enum RoundingType : UInt {
 
+        case plain   // 四舍五入 Round up on a tie
+
+        case down    // 向下取整 Always down == truncate
+
+        case giveUp  // 向上取整 Always up
+
+        case bankers // 在四舍五入的基础上，加上末尾数为5时，变成偶数的规则 on a tie round so last digit is even
+    }
+
+    // MARK: - + string addition
+    // - Parameter numberString: string
+    // - Returns: result string
+    func adding(numberString:String) -> String {
+        let number1 = NSDecimalNumber(string: self)
+        let number2 = NSDecimalNumber(string: numberString)
+        let summation = number1.adding(number2)
+        return summation.stringValue
+    }
+
+    // MARK: -  - string subtraction
+    // - Parameter numberString: string
+    // - Returns: result string
+    func subtracting(numberString:String) -> String {
+        let number1 = NSDecimalNumber(string: self)
+        let number2 = NSDecimalNumber(string: numberString)
+        let summation = number1.subtracting(number2)
+        return summation.stringValue
+    }
+
+    // MARK: - * string multiplication
+    // - Parameter numberString: string
+    // - Returns: result string
+    func multiplying(numberString:String) -> String {
+        let number1 = NSDecimalNumber(string: self)
+        let number2 = NSDecimalNumber(string: numberString)
+        let summation = number1.multiplying(by: number2)
+        return summation.stringValue
+    }
+
+    // MARK: - / string division
+    // - Parameter numberString: string
+    // - Returns: result string
+    func division(numberString:String) -> String {
+        let number1 = NSDecimalNumber(string: self)
+        let number2 = NSDecimalNumber(string: numberString)
+        let summation = number1.dividing(by:number2)
+        return summation.stringValue
+    }
+
+    // MARK: - keep a few decimal places and choose the type
+    // - Parameter num: keep a few decimal places  type : choose the type
+    // - isForceAddDecimal  46  num=2  return 46.00
+    // - Returns: string
+    func numType(num : Int , type : RoundingType = .down, isForceAddDecimal: Bool = false) -> String {
+        /*
+         enum NSRoundingMode : UInt {
+
+         case RoundPlain     // Round up on a tie
+         case RoundDown      // Always down == truncate
+         case RoundUp        // Always up
+         case RoundBankers   // on a tie round so last digit is even
+         }
+         */
+
+        // 90.7049 + 0.22
+        var rounding = NSDecimalNumber.RoundingMode.down
+        switch type {
+        case RoundingType.plain:
+            rounding = NSDecimalNumber.RoundingMode.plain
+        case RoundingType.down:
+            rounding = NSDecimalNumber.RoundingMode.down
+        case RoundingType.giveUp:
+            rounding = NSDecimalNumber.RoundingMode.up
+        case RoundingType.bankers:
+            rounding = NSDecimalNumber.RoundingMode.bankers
+        }
+        let roundUp = NSDecimalNumberHandler(roundingMode: rounding,
+                                             scale:Int16(num),
+                                             raiseOnExactness: false,
+                                             raiseOnOverflow: false,
+                                             raiseOnUnderflow: false,
+                                             raiseOnDivideByZero: true)
+
+        let discount = NSDecimalNumber(string: self)
+        let subtotal = NSDecimalNumber(string: "0")
+
+        let total = subtotal.adding(discount, withBehavior: roundUp).stringValue
+
+        guard isForceAddDecimal else {
+            return total
+        }
+        
+        var mutstr = String()
+        if total.contains(".") {
+            let float = total.components(separatedBy: ".").last!
+            if float.count == Int(num) {
+                mutstr .append(total)
+                return mutstr
+                
+            } else {
+                mutstr.append(total)
+                let all = num - float.count
+                for _ in 1...all {
+                    mutstr += "0"
+                }
+                return mutstr
+            }
+        } else {
+            mutstr.append(total)
+            if num > 0 {
+                mutstr += "."
+                for _ in 1...num {
+                    mutstr += "0"
+                }
+            }
+            return mutstr
+        }
+    }
+}
 

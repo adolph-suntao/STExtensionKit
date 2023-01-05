@@ -31,4 +31,18 @@ extension ST where Base == Double {
         let divisor = pow(10.0, Double(places))
         return Double(Int(base * divisor)) / divisor
     }
+    
+    /// 指定小数点位数
+    public func decimals(scale: Int16) -> Decimal {
+        let number1 = NSDecimalNumber(string: "\(base)")
+        let number2 = NSDecimalNumber(string: "0")
+        let behavior = NSDecimalNumberHandler.init(roundingMode: .down,
+                                                  scale: scale,
+                                                  raiseOnExactness: false,
+                                                  raiseOnOverflow: false,
+                                                  raiseOnUnderflow: false,
+                                                  raiseOnDivideByZero: false)
+        let res = number1.adding(number2, withBehavior: behavior)
+        return res.decimalValue
+    }
 }
